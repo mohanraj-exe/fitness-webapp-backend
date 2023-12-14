@@ -1,7 +1,8 @@
 const { Router } = require('express');
 const {
     addCalories,
-    // viewCalories,
+    viewCalories,
+    listCaloriesByDate,
     // updateCalories,
     // deleteCalories
 } = require('../controllers/calories.controller');
@@ -12,7 +13,8 @@ const router = Router();
 router
 
     .post('/add', auth_middleware, addCalories)
-    // .post('/view', viewCalories)
+    .get('/view', auth_middleware, viewCalories)
+    .get('/list_by_date', auth_middleware, listCaloriesByDate)
     // .post('/patch', updateCalories)
     // .post('/delete', deleteCalories)
 
