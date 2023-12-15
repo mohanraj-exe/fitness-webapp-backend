@@ -16,7 +16,7 @@ module.exports = {
         };
 
         _calories.findOne({ user_id: _id, createdAt: { $gte: startOfDay, $lte: endOfDay } }).then(function (value) {
-            console.log("value:", value);
+            // console.log("value:", value);
 
             if (value) {
 
@@ -30,7 +30,7 @@ module.exports = {
                         }
                     },
                     { returnDocument: 'after' }).then(function (value) {
-                        console.log("result document:", value);
+                        // console.log("result document:", value);
                         return res.status(200).json({ message: "Success", data: value });
                     })
             }
@@ -42,17 +42,17 @@ module.exports = {
                 });
 
                 add_calories.save().then(function (value) {
-                    console.log("value:", value);
+                    // console.log("value:", value);
                     return res.status(200).json({ message: "Success", data: value });
 
                 }).catch(function (err) {
-                    console.error("Error:", err);
+                    // console.error("Error:", err);
                     return res.status(500).json({ message: "Error", data: err });
                 })
 
             }
         }).catch(function (err) {
-            console.error(err);
+            // console.error(err);
             return res.status(404).json({ message: "", data: err });
         });
     },
@@ -61,107 +61,61 @@ module.exports = {
         const { _id } = req.user;
         const { inputDate } = req.query;
 
-        if (inputDate) {
-            _calories.findOne({
-                user_id: _id,
-                createdAt: {
-                    $gte: new Date(inputDate).setHours(0, 0, 0, 0),
-                    $lte: new Date(inputDate).setHours(23, 59, 59, 999)
-                }
+        const currentDate = new Date();
+        const startDate = inputDate ? new Date(`${inputDate}T00:00:00.000Z`) : new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0, 0);
+        const endDate = inputDate ? new Date(`${inputDate}T23:59:59.999Z`) : new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 23, 59, 59, 999);
+
+        _calories.findOne({
+            user_id: _id,
+            createdAt: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        })
+            .then(function (value) {
+                // console.log("value:", value);
+                return res.status(200).json({ message: "Success", data: value })
             })
-                .then(function (value) {
-                    // console.log("value:", value);
-                    return res.status(200).json({ message: "Success", data: value })
-                })
-                .catch(function (err) {
-                    // console.error(err);
-                    return res.status(400).json({ message: "Error", data: err });
-                });
-        }
-        else {
-            _calories.findOne({
-                user_id: _id,
-                createdAt: {
-                    $gte: new Date().setHours(0, 0, 0, 0),
-                    $lte: new Date().setHours(23, 59, 59, 999)
-                }
-            })
-                .then(function (value) {
-                    // console.log("value:", value);
-                    return res.status(200).json({ message: "Success", data: value })
-                })
-                .catch(function (err) {
-                    // console.error(err);
-                    return res.status(400).json({ message: "Error", data: err });
-                });
-        }
+            .catch(function (err) {
+                // console.error(err);
+                return res.status(400).json({ message: "Error", data: err });
+            });
     },
     updateCalories: async function (req, res, next) {
 
         const { _id } = req.user;
         const { meal_id, inputDate } = req.query;
         const { meal } = req.body;
-        // const currentDate = new Date();
-        // const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0, 0);
-        // const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 23, 59, 59, 999);
 
-        if (inputDate) {
-            console.log("YEs", inputDate, new Date(inputDate).setHours(0, 0, 0, 0), new Date(inputDate).setHours(23, 59, 59, 999), new Date(inputDate).setHours(0, 0, 0, 0) - new Date(inputDate).setHours(23, 59, 59, 999));
+        const currentDate = new Date();
+        const startDate = inputDate ? new Date(`${inputDate}T00:00:00.000Z`) : new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0, 0);
+        const endDate = inputDate ? new Date(`${inputDate}T23:59:59.999Z`) : new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 23, 59, 59, 999);
 
-            _calories.findOneAndUpdate({
-                user_id: _id,
-                createdAt: {
-                    $gte: new Date(inputDate).setHours(0, 0, 0, 0),
-                    $lte: new Date(inputDate).setHours(23, 59, 59, 999)
-                },
-                meals: {
-                    $elemMatch: { _id: meal_id }
-                }
+        _calories.findOneAndUpdate({
+            user_id: _id,
+            createdAt: {
+                $gte: startDate,
+                $lte: endDate
             },
-                {
-                    $set: {
-                        "meals.$": {
-                            _id: new ObjectId(),
-                            ...meal,
-                        }
-                    },
+            meals: {
+                $elemMatch: { _id: meal_id }
+            }
+        },
+            {
+                $set: {
+                    "meals.$": {
+                        _id: new ObjectId(),
+                        ...meal,
+                    }
                 },
-                { returnDocument: 'after' }).then(function (value) {
-                    console.log("result document:", value);
-                    return res.status(200).json({ message: "Success", data: value });
-                })
-                .catch(function (err) {
-                    // console.error(err);
-                    return res.status(400).json({ message: "Error", data: err });
-                });
-        }
-        else {
-            _calories.findOneAndUpdate({
-                user_id: _id,
-                createdAt: {
-                    $gte: new Date().setHours(0, 0, 0, 0),
-                    $lte: new Date().setHours(23, 59, 59, 999)
-                },
-                meals: {
-                    $elemMatch: { _id: meal_id }
-                }
             },
-                {
-                    $set: {
-                        "meals.$": {
-                            _id: new ObjectId(),
-                            ...meal,
-                        }
-                    },
-                },
-                { returnDocument: 'after' }).then(function (value) {
-                    console.log("result document:", value);
-                    return res.status(200).json({ message: "Success", data: value });
-                })
-                .catch(function (err) {
-                    // console.error(err);
-                    return res.status(400).json({ message: "Error", data: err });
-                });
-        }
+            { returnDocument: 'after' }).then(function (value) {
+                // console.log("result document:", value);
+                return res.status(200).json({ message: "Success", data: value });
+            })
+            .catch(function (err) {
+                // console.error(err);
+                return res.status(400).json({ message: "Error", data: err });
+            });
     }
 }
