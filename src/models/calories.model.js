@@ -5,7 +5,9 @@ const calorieSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'user'
     },
-    meals: Array
+    meals:[{
+        meal: Object
+    }]
 
 }, {timestamps: true});
 

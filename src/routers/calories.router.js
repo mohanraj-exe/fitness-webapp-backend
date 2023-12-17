@@ -3,7 +3,7 @@ const {
     addCalories,
     viewCalories,
     updateCalories,
-    // deleteCalories
+    deleteCalories
 } = require('../controllers/calories.controller');
 const { auth_middleware } = require('../middleware/auth.middleware');
 
@@ -14,7 +14,7 @@ router
     .post('/add', auth_middleware, addCalories)
     .get('/view', auth_middleware, viewCalories)
     .patch('/update', auth_middleware, updateCalories)
-    // .post('/delete', deleteCalories)
+    .delete('/delete', auth_middleware, deleteCalories)
 
 
 module.exports = router;

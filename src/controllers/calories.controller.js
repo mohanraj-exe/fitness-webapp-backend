@@ -10,10 +10,10 @@ module.exports = {
         const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0, 0);
         const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 23, 59, 59, 999);
 
-        const mealWithUniqueId = {
-            _id: new ObjectId(),
-            ...meal,
-        };
+        // const mealWithUniqueId = {
+        //     _id: new ObjectId(),
+        //     ...meal,
+        // };
 
         _calories.findOne({ user_id: _id, createdAt: { $gte: startOfDay, $lte: endOfDay } }).then(function (value) {
             // console.log("value:", value);
@@ -26,7 +26,9 @@ module.exports = {
                 },
                     {
                         $push: {
-                            meals: mealWithUniqueId
+                            meals: {
+                                meal: { ...meal }
+                            }
                         }
                     },
                     { returnDocument: 'after' }).then(function (value) {
@@ -38,7 +40,9 @@ module.exports = {
 
                 const add_calories = new _calories({
                     user_id: req.user._id,
-                    meals: mealWithUniqueId
+                    meals: {
+                        meal: { ...meal }
+                    }
                 });
 
                 add_calories.save().then(function (value) {
@@ -103,13 +107,49 @@ module.exports = {
         },
             {
                 $set: {
-                    "meals.$": {
-                        _id: new ObjectId(),
-                        ...meal,
+                    "meals.$.meal": {
+                        ...meal
                     }
                 },
             },
-            { returnDocument: 'after' }).then(function (value) {
+            { returnDocument: 'after' })
+            .then(function (value) {
+                // console.log("result document:", value);
+                return res.status(200).json({ message: "Success", data: value });
+            })
+            .catch(function (err) {
+                // console.error(err);
+                return res.status(400).json({ message: "Error", data: err });
+            });
+    },
+    deleteCalories: async function (req, res, next) {
+
+        const { _id } = req.user;
+        const { meal_id, inputDate } = req.query;
+        const currentDate = new Date();
+        const startDate = inputDate ? new Date(`${inputDate}T00:00:00.000Z`) : new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0, 0);
+        const endDate = inputDate ? new Date(`${inputDate}T23:59:59.999Z`) : new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 23, 59, 59, 999);
+
+
+        _calories.findOneAndUpdate({
+            user_id: _id,
+            createdAt: {
+                $gte: startDate,
+                $lte: endDate
+            },
+            meals: {
+                $elemMatch: { _id: meal_id }
+            }
+        },
+            {
+                $pull: {
+                    meals: {
+                        _id: meal_id
+                    }
+                }
+            },
+            { returnDocument: 'after' })
+            .then(function (value) {
                 // console.log("result document:", value);
                 return res.status(200).json({ message: "Success", data: value });
             })
