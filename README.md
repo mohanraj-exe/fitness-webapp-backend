@@ -20,13 +20,23 @@ The Fitness backend is a straightforward web application that provides users to 
 
 * Public APIs:
   * /api/public/nutritional_facts
+    * search_query and weight_in_grams -by using these query parameters public user can fetch food item data based on its weight.  
+
   * /api/public/calories_burned
+    * activity -by using this query public user can know the calories burned based on that activity.
+  
   * /api/public/exercise_info
   * /api/public/recipe_data
 
 * User APIs:
- * /api/user/signup
- * /api/user/login
+  * /api/user/signup
+  * /api/user/login
+ 
+* Calorie APIs:
+  * /api/calories/add
+  * /api/calories/view
+  * /api/calories/update
+  * /api/calories/delete
 
 ## Demo
 
