@@ -18,17 +18,15 @@ User can sign up and add food items eaten data,view,list,update and delete meals
 
 The Fitness backend is a straightforward web application that provides users to track calories and fetch data with the following apis:
 
-* **Public APIs:**
-  */api/public/nutritional_facts
-  */api/public/calories_burned
-  */api/public/exercise_info
-  */api/public/recipe_data
+* Public APIs:
+  * /api/public/nutritional_facts
+  * /api/public/calories_burned
+  * /api/public/exercise_info
+  * /api/public/recipe_data
 
-* **User APIs:**
-  */api/user/signup
-  */api/user/login
-
-* **Decrease:** Decrements the counter by 1.
+* User APIs:
+ * /api/user/signup
+ * /api/user/login
 
 ## Demo
 
